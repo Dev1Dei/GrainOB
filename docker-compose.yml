@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+
+  grainob-mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: grainob-db
+    ports:
+      - "3306:3306"
+    networks:
+      - grainob-network
+
+  grainoperationapi:
+    image: grainoperationapi-image
+    build:
+        context: ./backend/GrainOperationAPI/
+    ports:
+      - "5000:5000"
+    depends_on:
+      - grainob-mysql
+    networks:
+      - grainob-network
+
+  grainob-frontend:
+    image: grainob-frontend-image
+    build: ./frontend/grainob-frontend
+    ports:
+      - "8080:8080"
+    networks:
+      - grainob-network
+
+  grainob-phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8181:8181"
+    depends_on:
+      - grainob-mysql
+    environment:
+      PMA_HOST: grainob-mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+    networks:
+      - grainob-network
+
+  python-simulation:
+    build: ./Simulation
+    networks:
+      - grainob-network
+
+networks:
+  grainob-network:
+    driver: bridge
