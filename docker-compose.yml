@@ -1,23 +1,20 @@
-version: '3.8'
-
 services:
-
   grainob-mysql:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: grainob-db
     ports:
-      - "3306:3306"
+      - "3309:3306"
     networks:
       - grainob-network
 
   grainoperationapi:
     image: grainoperationapi-image
     build:
-        context: ./backend/GrainOperationAPI/
+      context: ./backend/GrainOperationAPI/
     ports:
-      - "5000:5000"
+      - "5003:5003"
     depends_on:
       - grainob-mysql
     networks:
@@ -25,16 +22,21 @@ services:
 
   grainob-frontend:
     image: grainob-frontend-image
-    build: ./frontend/grainob-frontend
+    build: 
+        context: ./frontend/grainob-frontend
+        dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8085:4200"
+    volumes:
+      - ./frontend/grainob-frontend:/app
+      - /app/node_modules
     networks:
       - grainob-network
 
   grainob-phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
-      - "8181:8181"
+      - "8185:80"  # Assuming phpMyAdmin is served on port 80 inside the container
     depends_on:
       - grainob-mysql
     environment:

@@ -1,21 +1,9 @@
-# Step 1: Build the Angular application in a node environment
-FROM node:16 as build-step
-
+# Stage 1: Build and serve the Angular app for development
+FROM node:16 AS development
 WORKDIR /app
-
-COPY package.json package-lock.json ./
-
+COPY package*.json ./
 RUN npm install
-
+RUN npm install -g @angular/cli
 COPY . .
+CMD ["./node_modules/.bin/ng", "serve", "--host", "0.0.0.0", "--poll", "2000"]
 
-RUN npm run build -- --output-path=./dist/out
-
-# Step 2: Serve the built Angular application using nginx
-FROM nginx:alpine
-
-COPY --from=build-step /app/dist/out/ /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
