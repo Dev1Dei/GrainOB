@@ -8,6 +8,8 @@ services:
       - "3309:3306"
     networks:
       - grainob-network
+    volumes:
+      - ./database:/var/lib/mysql
 
   grainoperationapi:
     image: grainoperationapi-image
@@ -48,6 +50,10 @@ services:
 
   python-simulation:
     build: ./Simulation
+    depends_on:
+      - grainob-mysql
+      - grainoperationapi
+      - grainob-frontend
     networks:
       - grainob-network
 

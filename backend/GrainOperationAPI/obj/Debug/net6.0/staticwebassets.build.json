@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "PiPFWRJNgs0pSMyIjGMFDtB+fO5jdDdFf/ieBeeFipw=",
+  "Source": "GrainOperationAPI",
+  "BasePath": "_content/GrainOperationAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
