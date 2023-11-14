@@ -1,10 +1,12 @@
 ﻿using GrainOperationAPI.Data;
+using GrainOperationAPI.Hubs;
 using GrainOperationAPI.Models;
 using GrainOperationAPI.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace GrainOperationAPI.Controllers
 {
@@ -14,31 +16,32 @@ namespace GrainOperationAPI.Controllers
     {
         private readonly GrainOperationContext _context;
         private readonly ILogger<TransactionsController> _logger;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public TransactionsController(GrainOperationContext context, ILogger<TransactionsController> logger)
+        public TransactionsController(GrainOperationContext context, ILogger<TransactionsController> logger, IHubContext<NotificationHub> hubContext)
         {
             _context = context;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<TransactionModel>> GetTransactions()
+        public async Task<ActionResult<IEnumerable<TransactionModel>>> GetTransactions()
         {
-            return _context.Transactions.ToList();
+            return await _context.Transactions.ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionModel>> GetTransaction(int id)
         {
             var transaction = await _context.Transactions.FindAsync(id);
-
             if (transaction == null)
             {
                 return NotFound();
             }
             return transaction;
         }
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTransaction(int id, TransactionModel transaction)
         {
@@ -46,56 +49,52 @@ namespace GrainOperationAPI.Controllers
             {
                 return BadRequest();
             }
-            _context.Entry(transaction).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Transactions.Any(e => e.TransactionId == id)) 
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            _context.Entry(transaction).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
             return NoContent();
         }
-        [HttpDelete("id")]
+
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTransaction(int id)
         {
             var transaction = await _context.Transactions.FindAsync(id);
-            if (transaction == null) 
-            { 
+            if (transaction == null)
+            {
                 return NotFound();
             }
 
             _context.Transactions.Remove(transaction);
             await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateTransactionStatus(int id, [FromBody] UpdateTransactionStatusDto statusDto)
+        {
+            var transaction = await _context.Transactions.FindAsync(id);
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            transaction.Status = statusDto.Status;
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
         [HttpPost]
         public async Task<ActionResult<TransactionModel>> PostTransaction([FromBody] TransactionDto transactionDto)
         {
-            _logger.LogInformation("Received transaction for processing: {@TransactionDto}", transactionDto);
-
-            // Attempt to retrieve the farmer from the database or create a new one if it doesn't exist
             var farmer = await _context.Farmers
-                            .FirstOrDefaultAsync(f => f.FarmerFirstName == transactionDto.FarmerFirstName &&
-                                                      f.FarmerLastName == transactionDto.FarmerLastName)
-                            ?? new FarmerModel { FarmerFirstName = transactionDto.FarmerFirstName, FarmerLastName = transactionDto.FarmerLastName };
+                .FirstOrDefaultAsync(f => f.FarmerFirstName == transactionDto.FarmerFirstName &&
+                                          f.FarmerLastName == transactionDto.FarmerLastName)
+                ?? new FarmerModel { FarmerFirstName = transactionDto.FarmerFirstName, FarmerLastName = transactionDto.FarmerLastName };
 
-            // Attempt to retrieve the truck from the database or create a new one if it doesn't exist
             var truck = await _context.Trucks
-                            .FirstOrDefaultAsync(t => t.TruckNumbers == transactionDto.TruckNumbers)
-                            ?? new TruckModel { TruckNumbers = transactionDto.TruckNumbers, TruckStorage = transactionDto.TruckStorage, Farmer = farmer };
+                .FirstOrDefaultAsync(t => t.TruckNumbers == transactionDto.TruckNumbers)
+                ?? new TruckModel { TruckNumbers = transactionDto.TruckNumbers, TruckStorage = transactionDto.TruckStorage, Farmer = farmer };
 
-            // Create the transaction model from the DTO
             var transaction = new TransactionModel
             {
                 Truck = truck,
@@ -104,31 +103,35 @@ namespace GrainOperationAPI.Controllers
                 Dryness = transactionDto.Grain.Dryness,
                 Cleanliness = transactionDto.Grain.Cleanliness,
                 GrainWeight = transactionDto.GrainWeight,
-                ArrivalTime = DateTime.Parse(transactionDto.Arrival), // Consider using DateTime.TryParse to avoid exceptions
+                ArrivalTime = DateTime.Parse(transactionDto.Arrival),
                 WantedPay = transactionDto.WantedPay,
                 PricePerTonne = transactionDto.PricePerTonne,
-                // Status should be set based on business logic, possibly here or elsewhere before saving
+                Status = "Pending"
             };
 
-            // Add the transaction to the context
             _context.Transactions.Add(transaction);
+            await _context.SaveChangesAsync();
 
-            try
+            var creationEvent = new
             {
-                // Save changes to the context
-                await _context.SaveChangesAsync();
-                _logger.LogInformation("Transaction processed successfully: {@Transaction}", transaction);
-
-                // Return the created transaction along with the '201 Created' response
-                return CreatedAtAction(nameof(GetTransaction), new { id = transaction.TransactionId }, transaction);
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "An error occurred while saving the transaction: {@TransactionDto}", transactionDto);
-                // Return a user-friendly message with the '500 Internal Server Error' response
-                return StatusCode(500, "An error occurred while processing your request.");
-            }
+                Farmer = new { farmer.FarmerFirstName, farmer.FarmerLastName },
+                Truck = new { truck.TruckNumbers, truck.TruckStorage },
+                Transaction = new
+                {
+                    transaction.TransactionId,
+                    transaction.GrainType,
+                    transaction.GrainClass,
+                    Dryness = transaction.Dryness,
+                    Cleanliness = transaction.Cleanliness,
+                    GrainWeight = transaction.GrainWeight,
+                    ArrivalTime = transaction.ArrivalTime,
+                    WantedPay = transaction.WantedPay,
+                    PricePerTonne = transaction.PricePerTonne
+                }
+            };
+            _logger.LogInformation($"!!!!!!!!!!!!!!!!!!!Sending message: {creationEvent}");
+            await _hubContext.Clients.All.SendAsync("CreationEventOccurred", creationEvent);
+            return CreatedAtAction(nameof(GetTransaction), new { id = transaction.TransactionId }, transaction);
         }
-
     }
 }

@@ -19,6 +19,5 @@ namespace GrainOperationAPI.Models
 
         // Navigation properties
         public FarmerModel Farmer { get; set; }
-        public ICollection<TransactionModel> Transactions { get; set; } // One-to-Many relationship
     }
 }

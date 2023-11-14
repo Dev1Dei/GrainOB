@@ -39,10 +39,7 @@ namespace GrainOperationAPI.Data
                 entity.Property(e => e.TruckNumbers).IsRequired();
                 entity.Property(e => e.TruckStorage).IsRequired();
                 // Define the relationship with FarmerModel.
-                entity.HasOne(t => t.Farmer)
-                    .WithMany(f => f.Trucks)
-                    .HasForeignKey(t => t.FarmerId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(t => t.Farmer);
             });
 
             // TransactionModel configuration
@@ -54,10 +51,7 @@ namespace GrainOperationAPI.Data
                 entity.Property(e => e.TruckId).HasColumnName("truck_id");
                 entity.HasIndex(e => e.TruckId); // Create an index on the TruckId column.
                                                  // Define the relationship with TruckModel.
-                entity.HasOne(tr => tr.Truck)
-                    .WithMany(t => t.Transactions)
-                    .HasForeignKey(tr => tr.TruckId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(tr => tr.Truck);
                 // Assuming the other fields are required, you would also set them as required.
                 entity.Property(e => e.GrainType).IsRequired();
                 entity.Property(e => e.GrainClass).IsRequired();

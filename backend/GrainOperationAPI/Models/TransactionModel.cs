@@ -29,7 +29,7 @@ namespace GrainOperationAPI.Models
         [Column("price_per_tonne")]
         public double PricePerTonne { get; set; }
         [Column("status")]
-        public string? Status { get; set; } // This can be 'Accepted', 'Denied', or null
+        public string? Status { get; set; } = "Pending"; // This can be 'Accepted', 'Denied', or null
 
         // Navigation properties
         public TruckModel Truck { get; set; } // Navigation property back to TruckModel

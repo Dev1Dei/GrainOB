@@ -4,6 +4,7 @@
     position: fixed;
     left: 0;
     top: 0;
+    z-index: 1;
     background-color: #003a33;
     padding: 15px;
     box-shadow: 6px 0 15px rgba(0, 0, 0, 0.5);

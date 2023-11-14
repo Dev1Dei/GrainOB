@@ -1,4 +1,5 @@
 using GrainOperationAPI.Data;
+using GrainOperationAPI.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,22 +11,24 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:8085")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<GrainOperationContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 1, 0)),
-            mySqlOptions => mySqlOptions.EnableRetryOnFailure(
+        new MySqlServerVersion(new Version(8, 0, 21)), // Make sure the version number is correct for your MySQL server
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
             maxRetryDelay: TimeSpan.FromSeconds(10),
             errorNumbersToAdd: null)
-        )
-    );
+    )
+);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -40,12 +43,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// Use CORS policy
-app.UseCors("AllowSpecificOrigin");
-//app.UseHttpsRedirection();
 
+app.UseCors("AllowSpecificOrigin");
+
+app.UseRouting();
+
+//app.UseAuthentication(); // Include this only if you're using authentication
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notificationhub");
+});
 
 app.Run();

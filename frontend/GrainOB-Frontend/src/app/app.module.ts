@@ -1,12 +1,13 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 import { TransactionListComponent } from './transaction-list/transaction-list.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { PopupNotificationComponent } from './popup-notification/popup-notification.component';
+import { NotificationComponent } from './notification/notification.component';
 
 @NgModule({
   declarations: [
@@ -14,11 +15,12 @@ import { PopupNotificationComponent } from './popup-notification/popup-notificat
     HeaderComponent,
     TransactionListComponent,
     SidebarComponent,
-    PopupNotificationComponent
+    NotificationComponent
   ],
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

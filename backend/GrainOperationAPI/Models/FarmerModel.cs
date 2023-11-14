@@ -14,7 +14,5 @@ namespace GrainOperationAPI.Models
         [Column("FarmerLastName")]
         public string? FarmerLastName { get; set; }
 
-        // Navigation property
-        public ICollection<TruckModel>? Trucks { get; set; } // One-to-many relationship with trucks
     }
 }
