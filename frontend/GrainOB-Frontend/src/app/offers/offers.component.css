@@ -1,0 +1,123 @@
+.main-content {
+    margin-left: 260px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 80vh;
+}
+.table-responsive {
+    overflow-x: auto;
+}
+table {
+    width: calc(100% - 40px);
+    border-collapse: collapse;
+    margin: 20px auto;
+  }
+  
+  td {
+    padding: 10px 19px;
+    border-bottom: 1px solid #ddd; /* Light horizontal lines for each row */
+    text-align:center;
+  }
+  
+  th {
+    background-color: #fff; /* Light grey background for headers */
+    color: #333;
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  tr:hover {
+    background-color: #f2f2f2; /* Highlight row on hover */
+  }
+  
+  button {
+    padding: 8px 16px;
+    margin-right: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: #5cb85c; /* Green background for accept button */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .pagination-container {
+    display: flex;
+    justify-content: center; /* Center pagination buttons */
+    margin-top: 20px;
+}
+.pagination-btn {
+    padding: 8px 16px;
+    margin: 0 10px; /* Adds space between buttons */
+    border: 1px solid #ddd;
+    background-color: #005f54;
+    font-weight: bold;
+    color: #B8860B;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.pagination-btn:hover {
+    background-color: #014941;
+    border-color: #ccc;
+}
+
+.pagination-btn[disabled] {
+    background-color: rgb(184, 184, 184);
+    cursor: not-allowed;
+    color: black;
+}
+.action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+} 
+.no-transactions {
+    text-align: center;
+    margin-top: 50px; /* Or whatever value makes sense for your layout */
+  }
+  
+  .no-transactions h2 {
+    font-size: 24px; /* Or your preferred size */
+    color: #666; /* Or any color that fits your design */
+    opacity: 0.6; /* Makes the text less pronounced if that's desired */
+  }
+
+  .accept-button {
+    border-color: #4CAF50;
+    color: #4CAF50;
+    background-color: #fff;
+}
+.accept-button i {
+    margin: 2px;
+}
+.deny-button i {
+    margin: 2px;
+}
+
+.deny-button {
+    border-color: #f44336;
+    color: #f44336;
+    background-color: #fff;
+}
+.acceptdeny-container button {
+    border: 2px solid;
+    padding: 5px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: 400;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+}
+.acceptdeny-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}

@@ -16,6 +16,19 @@ export interface Transaction {
   status: string;
 }
 
+export interface ExtendedTransaction extends Transaction{
+  farmerFirstName: string;
+  farmerLastName: string;
+  truckNumbers: string;
+  truckStorage: number;
+}
+
+export interface PaginatedResponse<T> {
+  totalRecords: number;
+  transactions: T[];
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -30,8 +43,24 @@ export class TransactionService {
     return this.http.get<Transaction[]>(this.apiUrl);
   }
   updateTransactionStatus(transactionId: number, status: string): Observable<any> {
-    console.log(`Updating transaction status for ID: ${transactionId} to ${status}`);
     const url = `${this.apiUrl}/${transactionId}/status`;
     return this.http.put(url, { status });
+  }
+ 
+  getTotalPendingTransactions(): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/pending/count`);
+  }
+  getTotalAoDTransactions(): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/AoD/count`);
+  }
+  getPendingTransactionsPage(page: number, pageSize: number): Observable<PaginatedResponse<ExtendedTransaction>> {
+    return this.http.get<PaginatedResponse<ExtendedTransaction>>(`${this.apiUrl}/pending`, {
+      params: { pageNumber: page.toString(), pageSize: pageSize.toString() }
+    });
+  }
+  getAoDTransactionsPage(page: number, pageSize: number, sort = 'asc'): Observable<PaginatedResponse<ExtendedTransaction>> {
+    return this.http.get<PaginatedResponse<ExtendedTransaction>>(`${this.apiUrl}/AcceptedOrDenied`, {
+      params: { pageNumber: page.toString(), pageSize: pageSize.toString(), sort}
+    });
   }
 }

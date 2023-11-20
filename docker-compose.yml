@@ -57,6 +57,15 @@ services:
     networks:
       - grainob-network
 
+  python-prices:
+    build: ./Psimulation
+    depends_on:
+      - grainob-mysql
+      - grainoperationapi
+      - grainob-frontend
+    networks:
+      - grainob-network
+      
 networks:
   grainob-network:
     driver: bridge

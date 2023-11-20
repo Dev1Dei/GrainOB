@@ -1,0 +1,65 @@
+<div class="main-content">
+    <div *ngIf="transactions && transactions.length; else noTransactions">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>
+                ID
+                <button (click)="toggleSortOrder()" class="sort-button">
+                    <i [ngClass]="{
+                      'fas': true,
+                      'fa-arrow-up': sort === 'asc',
+                      'fa-arrow-down': sort === 'desc'
+                    }"></i>
+                  </button>
+              </th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Truck Numbers</th>
+            <th>Truck Storage (t)</th>
+            <th>Grain Type</th>
+            <th>Grain Class</th>
+            <th>Arrival Time</th>
+            <th>Dryness (%)</th>
+            <th>Cleanliness (%)</th>
+            <th>Wanted Pay (€)</th>
+            <th>PPT (€/t)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let transaction of transactions"
+            [ngClass]="{'status-accepted': transaction.status === 'Accepted', 'status-denied': transaction.status === 'Denied'}">
+            <td>{{ transaction.transactionId }}</td>
+            <td>{{ transaction.farmerFirstName }}</td>
+            <td>{{ transaction.farmerLastName }}</td>
+            <td>{{ transaction.truckNumbers }}</td>
+            <td>{{ transaction.truckStorage }}t</td>
+            <td>{{ transaction.grainType }}</td>
+            <td>
+              <span *ngIf="transaction.grainClass !== 'None'; else blankSpace">{{ transaction.grainClass }}</span>
+              <ng-template #blankSpace>&nbsp;</ng-template>
+            </td>
+            <td>{{ transaction.arrivalTime | date: 'yyyy-MM-dd HH:mm' }}</td>
+            <td>{{ transaction.dryness }}%</td>
+            <td>{{ transaction.cleanliness }}%</td>
+            <td>{{ transaction.wantedPay }}€</td>
+            <td>{{ transaction.pricePerTonne }}€/t</td>
+            <td>{{ transaction.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination-container" *ngIf="totalRecords > pageSize">
+        <button class="pagination-btn" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+        <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage >= getMaxPage()">Next</button>
+      </div>
+    </div>
+    <ng-template #noTransactions>
+      <div class="no-transactions">
+        <h2>There are no accepted or denied transactions!</h2>
+      </div>
+    </ng-template>
+</div>
+  

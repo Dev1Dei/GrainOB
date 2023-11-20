@@ -9,7 +9,7 @@ namespace GrainOperationAPI.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("transaction_id")]
         public int TransactionId { get; set; } // Primary Key
-        [ForeignKey("Truck")]
+        [ForeignKey(nameof(Truck))]
         [Column("truck_id")]
         public int TruckId { get; set; } // Foreign Key
         [Column("grain_type")]

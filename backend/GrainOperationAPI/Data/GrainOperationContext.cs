@@ -13,6 +13,8 @@ namespace GrainOperationAPI.Data
         public DbSet<FarmerModel> Farmers { get; set; }
         public DbSet<TruckModel> Trucks { get; set; }
         public DbSet<TransactionModel> Transactions { get; set; }
+        
+        public DbSet<PriceModel> Prices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

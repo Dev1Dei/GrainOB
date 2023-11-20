@@ -30,7 +30,89 @@ namespace GrainOperationAPI.Controllers
         {
             return await _context.Transactions.ToListAsync();
         }
+        [HttpGet("pending")]
+        public async Task<ActionResult> GetPendingTransactions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            int totalRecords = await _context.Transactions.CountAsync(t => t.Status == "Pending");
+            var transactions = await _context.Transactions
+                .Where(t => t.Status == "Pending")
+                .Include(t => t.Truck)
+                    .ThenInclude(tr => tr.Farmer)
+                .Select(t => new
+                 {
+                    t.TransactionId,
+                    t.GrainType,
+                    t.GrainClass,
+                    t.Dryness,
+                    t.Cleanliness,
+                    t.WantedPay,
+                    t.ArrivalTime,
+                    t.PricePerTonne,
+                    TruckNumbers = t.Truck.TruckNumbers,
+                    TruckStorage = t.Truck.TruckStorage,
+                    FarmerFirstName = t.Truck.Farmer.FarmerFirstName,
+                    FarmerLastName = t.Truck.Farmer.FarmerLastName,
+                 })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
+            return Ok(new { TotalRecords = totalRecords, Transactions = transactions });
+        }
+        [HttpGet("AcceptedOrDenied")]
+        public async Task<ActionResult> GetAcceptedorDeniedTransactions(
+           [FromQuery] int pageNumber = 1,
+           [FromQuery] int pageSize = 10,
+           [FromQuery] string sort = "asc"
+       )
+        {
+            var transactionsQuery = _context.Transactions
+                .Where(t => t.Status == "Accepted" || t.Status == "Denied")
+                .Include(t => t.Truck)
+                    .ThenInclude(tr => tr.Farmer);
+
+            // Apply sorting based on the 'sort' parameter
+            var orderedTransactionsQuery = sort == "asc"
+                ? transactionsQuery.OrderBy(t => t.TransactionId)
+                : transactionsQuery.OrderByDescending(t => t.TransactionId);
+
+            int totalRecords = await orderedTransactionsQuery.CountAsync();
+
+            var transactions = await orderedTransactionsQuery
+                .Select(t => new
+                {
+                    t.TransactionId,
+                    t.GrainType,
+                    t.GrainClass,
+                    t.Dryness,
+                    t.Cleanliness,
+                    t.WantedPay,
+                    t.ArrivalTime,
+                    t.PricePerTonne,
+                    t.Status,
+                    TruckNumbers = t.Truck.TruckNumbers,
+                    TruckStorage = t.Truck.TruckStorage,
+                    FarmerFirstName = t.Truck.Farmer.FarmerFirstName,
+                    FarmerLastName = t.Truck.Farmer.FarmerLastName,
+                })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new { TotalRecords = totalRecords, Transactions = transactions });
+        }
+
+        // This action will handle requests like: GET api/transactions/pending/count
+        [HttpGet("pending/count")]
+        public async Task<ActionResult<int>> GetPendingTransactionsCount()
+        {
+            return await _context.Transactions.CountAsync(t => t.Status == "Pending");
+        }
+        [HttpGet("AoD/count")]
+        public async Task<ActionResult<int>> GetAoDTransactionsCount()
+        {
+            return await _context.Transactions.CountAsync(t => t.Status == "Accepted" || t.Status == "Denied");
+        }
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionModel>> GetTransaction(int id)
         {
@@ -129,7 +211,7 @@ namespace GrainOperationAPI.Controllers
                     PricePerTonne = transaction.PricePerTonne
                 }
             };
-            _logger.LogInformation($"!!!!!!!!!!!!!!!!!!!Sending message: {creationEvent}");
+            _logger.LogInformation($"Sending message: {creationEvent}");
             await _hubContext.Clients.All.SendAsync("CreationEventOccurred", creationEvent);
             return CreatedAtAction(nameof(GetTransaction), new { id = transaction.TransactionId }, transaction);
         }
