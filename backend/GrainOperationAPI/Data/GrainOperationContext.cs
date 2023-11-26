@@ -13,8 +13,13 @@ namespace GrainOperationAPI.Data
         public DbSet<FarmerModel> Farmers { get; set; }
         public DbSet<TruckModel> Trucks { get; set; }
         public DbSet<TransactionModel> Transactions { get; set; }
-        
         public DbSet<PriceModel> Prices { get; set; }
+
+        public DbSet<UserBalanceModel> UserBalances { get; set; }
+
+        public DbSet<StorageContainerModel> StorageContainers { get; set; }
+
+        public DbSet<BalanceHistoryModel> BalanceHistory { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,6 +33,17 @@ namespace GrainOperationAPI.Data
                 entity.Property(e => e.FarmerId).HasColumnName("farmer_id").ValueGeneratedOnAdd();
                 entity.Property(e => e.FarmerFirstName).IsRequired();
                 entity.Property(e => e.FarmerLastName).IsRequired();
+            });
+
+            modelBuilder.Entity<PriceModel>(entity =>
+            {
+                entity.ToTable("Prices");
+                entity.HasKey(e => e.PriceId);
+                entity.Property(e => e.PriceId).HasColumnName("price_id").ValueGeneratedOnAdd();
+                entity.Property(e => e.GrainType).IsRequired();
+                entity.Property(e => e.GrainClass).IsRequired(false);
+                entity.Property(e => e.Price).IsRequired();
+                entity.Property(e => e.Timestamp).IsRequired();
             });
 
             // TruckModel configuration
@@ -64,6 +80,59 @@ namespace GrainOperationAPI.Data
                 entity.Property(e => e.WantedPay).IsRequired();
                 entity.Property(e => e.PricePerTonne).IsRequired();
                 entity.Property(e => e.Status).IsRequired(false);
+                entity.Property(e => e.ContainerId).HasColumnName("container_id").IsRequired(false); // Nullable foreign key
+                entity.HasOne(t => t.StorageContainer)
+                      .WithMany()
+                      .HasForeignKey(t => t.ContainerId);
+            });
+            modelBuilder.Entity<UserBalanceModel>(entity =>
+            {
+                entity.ToTable("UserBalance");
+                entity.HasKey(e => e.UserId);
+                entity.Property(e => e.UserId).HasColumnName("UserId");
+                entity.Property(e => e.Balance).IsRequired();
+            });
+            modelBuilder.Entity<StorageContainerModel>(entity =>
+            {
+                entity.ToTable("StorageContainer");
+                entity.HasKey(e => e.ContainerId);
+                entity.Property(e => e.ContainerId).HasColumnName("ContainerId").ValueGeneratedOnAdd();
+                entity.Property(e => e.UserId).HasColumnName("UserId");
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId); // Assuming UserBalanceModel does not have a collection of StorageContainerModel
+                entity.Property(e => e.GrainType).IsRequired(false);
+                entity.Property(e => e.GrainClass).IsRequired(false);
+                entity.Property(e => e.Weight).IsRequired(); // If it's supposed to be nullable
+                entity.Property(e => e.Dryness).IsRequired();
+                entity.Property(e => e.Cleanliness).IsRequired();
+                entity.Property(e => e.GrainType).IsRequired(false);
+                entity.Property(e => e.GrainClass).IsRequired(false);
+                entity.Property(e => e.Weight).IsRequired();
+                entity.Property(e => e.Dryness).IsRequired();
+                entity.Property(e => e.Cleanliness).IsRequired();
+                entity.Property(e => e.TotalCapacity).IsRequired();
+                entity.Property(e => e.FreeSpace).IsRequired();
+                entity.Property(e => e.StoredSpace).IsRequired();
+
+            });
+            modelBuilder.Entity<BalanceHistoryModel>(entity =>
+            {
+                entity.ToTable("BalanceHistory");
+                entity.HasKey(e => e.HistoryId);
+                entity.Property(e => e.HistoryId).HasColumnName("history_id").ValueGeneratedOnAdd();
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId); // Assuming UserBalanceModel does not have a collection of BalanceHistoryModel
+                entity.Property(e => e.TransactionId).HasColumnName("transaction_id").IsRequired(false);
+                entity.Property(e => e.ChangeAmount).IsRequired();
+                entity.Property(e => e.NewBalance).IsRequired();
+                entity.Property(e => e.TransactionType).IsRequired(false);
+                entity.Property(e => e.GrainType).IsRequired(false);
+                entity.Property(e => e.GrainClass).IsRequired(false);
+                entity.Property(e => e.Weight).IsRequired();
+                entity.Property(e => e.TransactionDate).IsRequired();
             });
         }
     }

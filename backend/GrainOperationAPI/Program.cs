@@ -1,5 +1,6 @@
 using GrainOperationAPI.Data;
 using GrainOperationAPI.Hubs;
+using GrainOperationAPI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,8 @@ builder.Services.AddDbContext<GrainOperationContext>(options =>
             errorNumbersToAdd: null)
     )
 );
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<PriceService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

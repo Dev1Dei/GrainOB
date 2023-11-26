@@ -6,33 +6,33 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
-import { TransactionListComponent } from './transaction-list/transaction-list.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { NotificationComponent } from './notification/notification.component';
 import { OffersComponent } from './offers/offers.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FarmersComponent } from './farmers/farmers.component';
-
-const routes: Routes = [
-  {path: 'offers', component: OffersComponent}
-]
+import { PricesComponent } from './prices/prices.component';
+import { WarehouseComponent } from './warehouse/warehouse.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-    TransactionListComponent,
     SidebarComponent,
     NotificationComponent,
     OffersComponent,
-    FarmersComponent
+    FarmersComponent,
+    PricesComponent,
+    WarehouseComponent,
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     BrowserAnimationsModule,
     RouterModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

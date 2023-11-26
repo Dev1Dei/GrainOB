@@ -1,0 +1,79 @@
+<div class="grid-container">
+    <div *ngFor="let container of containers" class="container-card">
+      <div class="icon-container" [ngSwitch]="container.totalCapacity">
+        <img *ngSwitchCase="500" class="icon" src="../../assets/Icons/silo.png" />
+        <img *ngSwitchCase="2000" class="icon" src="../../assets/Icons/100.png" />
+        <img *ngSwitchCase="7500" class="icon" src="../../assets/Icons/200.png" />
+        <img *ngSwitchCase="15000" class="icon3" src="../../assets/Icons/tank.png" />
+        <div *ngSwitchDefault>Other Capacity</div>
+      </div>
+      <p class="container-name">{{container.name}}</p>
+      <p>Grain Type: {{ container.grainType }}</p>
+      <p>Grain Class: {{ container.grainClass }}</p>
+      <div class="progress-bar-container">
+        <label>Dryness:</label>
+        <div class="progress-bar-background">
+          <div
+            class="progress-bar-fill"
+            [style.width]="container.dryness + '%'"
+            [ngClass]="{
+              'red': container.dryness < 25,
+              'orange': container.dryness >= 25 && container.dryness < 50,
+              'yellow': container.dryness >= 50 && container.dryness < 75,
+              'green': container.dryness >= 75
+            }"
+          ></div>
+        </div>
+      </div>
+      <div class="progress-bar-container">
+        <label>Cleanliness:</label>
+        <div class="progress-bar-background">
+          <div
+            class="progress-bar-fill"
+            [style.width]="container.cleanliness + '%'"
+            [ngClass]="{
+              'red': container.cleanliness < 25,
+              'orange': container.cleanliness >= 25 && container.cleanliness < 50,
+              'yellow': container.cleanliness >= 50 && container.cleanliness < 75,
+              'green': container.cleanliness >= 75
+            }"
+          ></div>
+        </div>
+      </div>
+      <p>Total Capacity: {{ container.totalCapacity }} tonnes</p>
+      <p>Stored Space: {{ container.storedSpace }} tonnes</p>
+      <p>Free Space: {{ container.freeSpace }} tonnes</p>
+
+      <div class="container-card-actions">
+        <button (click)="cleanContainer(container.containerId)">Clean</button>
+        <button (click)="dryContainer(container.containerId)">Dry</button>
+      </div>
+      <div class="container-card-actions" id="sell-button">
+        <button (click)="sellGrain(container.containerId, container.grainType, container.grainClass, container.weight)">Sell grain</button>
+      </div>
+    </div>
+    <div *ngIf="containers.length < 6" class="container-card buy-card">
+      <div *ngIf="!showBuyOptions" class="add-container-icon" (click)="toggleBuyOptions()">
+        <img src="../../assets/Icons/add-icon.png" alt="Add Container" />
+        <p class="add-container-text">Add Container</p>
+      </div>
+      <div *ngIf="showBuyOptions" class="buy-options">
+        <div class="option-header">
+          <h3>Select Capacity & Name</h3>
+        </div>
+        <input type="text" [(ngModel)]="newContainerName" placeholder="Enter container name" class="capacity-select">
+        <select [(ngModel)]="selectedCapacity" class="capacity-select">
+          <option [value]="500">500 tonnes</option>
+          <option [value]="2000">2000 tonnes</option>
+          <option [value]="7500">7500 tonnes</option>
+          <option [value]="15000">15000 tonnes</option>
+        </select>
+        <p class="cost">Cost: {{ calculateCost(selectedCapacity) | currency:'EUR' }}</p>
+        <div class="action-buttons">
+          <button class="buy-button" (click)="buyContainer(); toggleBuyOptions()">Buy</button>
+          <button class="cancel-button" (click)="toggleBuyOptions()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

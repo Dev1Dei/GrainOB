@@ -1,11 +1,15 @@
 <div class="sidebar">
     <h2>Menu</h2>
     <ul>
-        <li><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
         <li><a href="/farmers"><i class="fas fa-tractor"></i> Farmers</a></li>
         <li><a href="/offers"><i class="fas fa-handshake"></i> Offers</a></li>
-        <li><a href="#"><i class="fas fa-chart-line"></i> Prices</a></li>
-        <li><a href="#"><i class="fas fa-warehouse"></i> Warehouse</a></li>
+        <li><a href="/prices"><i class="fas fa-chart-line"></i> Prices</a></li>
+        <li><a href="/warehouse"><i class="fas fa-warehouse"></i> Warehouse</a></li>
     </ul>
+    <div class="balance-display">
+        <h3>Balance</h3>
+        <p *ngIf="balance !== null">{{ balance | currency:'EUR' }}</p>
+        <p *ngIf="balance === null">Loading...</p>
+    </div>
 </div>
 

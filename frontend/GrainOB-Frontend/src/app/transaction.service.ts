@@ -53,6 +53,13 @@ export class TransactionService {
   getTotalAoDTransactions(): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/AoD/count`);
   }
+
+  assignContainer(transactionId: number, containerId: number): Observable<any> {
+    const url = `${this.apiUrl}/${transactionId}/assign-container`;
+    const body = { containerId: containerId };
+    return this.http.put(url, body);
+  }
+
   getPendingTransactionsPage(page: number, pageSize: number): Observable<PaginatedResponse<ExtendedTransaction>> {
     return this.http.get<PaginatedResponse<ExtendedTransaction>>(`${this.apiUrl}/pending`, {
       params: { pageNumber: page.toString(), pageSize: pageSize.toString() }
@@ -62,5 +69,9 @@ export class TransactionService {
     return this.http.get<PaginatedResponse<ExtendedTransaction>>(`${this.apiUrl}/AcceptedOrDenied`, {
       params: { pageNumber: page.toString(), pageSize: pageSize.toString(), sort}
     });
+  }
+  completeTransaction(transactionId: number): Observable<any> {
+    const url = `${this.apiUrl}/${transactionId}/complete`;
+    return this.http.post(url, {});
   }
 }

@@ -58,7 +58,36 @@ table {
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
 }
+.modern-dropdown {
+  /* General styling */
+  background-color: white; /* Background color */
+  color: #333; /* Text color */
+  padding: 10px 10px; /* Padding for the dropdown */
+  border: 1px solid #ddd; /* Border color and width */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  cursor: pointer; /* Cursor style on hover */
 
+  /* Dropdown arrow styling */
+  appearance: none; /* Removes default styling of select element */
+  -webkit-appearance: none; /* For Safari and Chrome */
+  -moz-appearance: none; /* For Firefox */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10L12 15L17 10H7Z" fill="%23333"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center; /* Position of the arrow image */
+  background-size: 12px; /* Size of the arrow image */
+
+  /* Styling for focus state */
+  &:focus {
+      outline: none; /* Removes the default focus outline */
+      box-shadow: 0 0 0 2px #0056b3; /* Adds a custom focus outline */
+  }
+
+  /* Styling for hover state */
+  &:hover {
+      background-color: #f7f7f7; /* Slightly darker background on hover */
+  }
+}
 .pagination-btn:hover {
     background-color: #014941;
     border-color: #ccc;

@@ -7,10 +7,9 @@
         public string TruckNumbers { get; set; }
         public int TruckStorage { get; set; }
         public GrainDto Grain { get; set; }
-        public double GrainWeight { get; set; }
+        public decimal GrainWeight { get; set; }
         public string Arrival { get; set; }
         public double WantedPay { get; set; }
         public double PricePerTonne { get; set; }
-
     }
 }

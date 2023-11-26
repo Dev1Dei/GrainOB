@@ -31,7 +31,12 @@ export class NotificationService {
       .then(() => console.log('Connection started'))
       .catch(err => console.error('Error while starting connection: ' + err));
   }
-
+  public emitTransactionCompleted(notification: any) {
+    console.log('Emitting transaction completed notification:', notification);
+    this.zone.run(() => {
+        this.notificationSubject.next(notification);
+    });
+}
   public addNotificationListeners(): void {
     this.hubConnection.on('CreationEventOccurred', (notification) => {
       this.zone.run(() => {

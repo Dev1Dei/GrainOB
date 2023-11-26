@@ -4,7 +4,7 @@ import { Farmer } from '../farmer.service';
 import { Truck } from '../truck.service';
 import { Transaction, TransactionService } from '../transaction.service';
 import { animate, animateChild, query, stagger, style, transition, trigger, AnimationEvent } from '@angular/animations';
- 
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-notification',
   templateUrl: './notification.component.html',
@@ -41,7 +41,8 @@ export class NotificationComponent implements OnInit {
   constructor(
     private notificationService: NotificationService,
     private changeDetectorRef: ChangeDetectorRef,
-    private transactionService: TransactionService
+    private transactionService: TransactionService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +50,7 @@ export class NotificationComponent implements OnInit {
       this.notificationService.addNotificationListeners();
     });
     this.notificationService.notifications$.subscribe(notification => {
+      console.log('New notification received:', notification)
       if(this.notifications.length >= 3 && !this.animationInProgress){
         this.animationInProgress = true;
 
@@ -101,7 +103,16 @@ export class NotificationComponent implements OnInit {
   }
   acceptAndChangeStatus(transactionId: number, index:number) {
     this.acceptOffer(index);
-    this.statusAccept(transactionId);
+    this.router.navigate(['/offers']);
+    // this.transactionService.getTransactions().subscribe({
+    //   next: (transactions) => {
+    //     const transaction = transactions.find(t => t.transactionId === transactionId);
+    //     if(transaction) {
+    //       this.transactionCompleted(transaction);
+    //     }
+    //   },
+    //   error: (error) => console.error('Error fetching transactions:', error)
+    // })
   }
   statusDeny(transactionId: number) {
     // Call the service to update the status to 'Denied'
@@ -132,6 +143,14 @@ export class NotificationComponent implements OnInit {
       this.animationInProgress = false;
       this.changeDetectorRef.detectChanges();
     }
+  }
+  transactionCompleted(transaction: any) {
+    const completedNotification = {
+      type: 'transactionCompleted',
+      message: `Transaction Completed!\nYou bought: ${transaction.grainType} ${transaction.grainClass ? transaction.grainClass : ''}\nWeight: ${transaction.grainWeight}t\nFor: ${transaction.wantedPay.toFixed(2)} Eur`,
+      transaction: transaction
+    };
+    this.notificationService.emitTransactionCompleted(completedNotification);
   }
   
   getTopPosition(index: number): number {

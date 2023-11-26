@@ -1,0 +1,223 @@
+/* warehouse.component.css */
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    gap: 20px; /* Larger gap */
+    padding: 20px;
+    margin-left: 280px;
+  }
+  
+  .container-card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+  
+  .warehouse-card {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ccc;
+    border-radius: 10px; /* Rounded corners */
+  }
+  
+  .options {
+    display: block;
+    margin-top: 20px;
+    margin-left: 280px;
+  }
+  .icon, .icon3{
+    width: 80px;
+    height: 80px;
+  }
+  .icon-container {
+    width: 120px; /* Adjust size as needed */
+    height: 120px; /* Adjust size as needed */
+    background-color: #B8860B;
+    border-radius: 50%; /* Make it circular */
+    display: flex;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
+  }
+  /* warehouse.component.css */
+
+/* ... existing styles ... */
+.buy-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.buy-card:hover {
+    border-color: #B8860B;
+}
+
+.add-container-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin:auto;
+}
+
+.add-container-icon img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 10px;
+}
+
+.buy-options {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.close-icon {
+    cursor: pointer;
+    /* Style the close icon as needed */
+}
+
+.capacity-select {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.cost {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-around;
+}
+
+.buy-button,
+.cancel-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.buy-button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+.buy-button:hover {
+    background-color: #45a049; /* Darker green */
+}
+
+.cancel-button {
+    background-color: #f44336; /* Red */
+    color: white;
+}
+
+.cancel-button:hover {
+    background-color: #da190b; /* Darker red */
+}
+.add-container-text{
+    font-size: larger;
+    font-weight: bold;
+    width: 130px;
+}
+.progress-bar-container {
+    width: 100%;
+    margin: 10px 0;
+  }
+  
+  .progress-bar-background {
+    background-color: #eee;
+    border-radius: 10px;
+    height: 20px;
+  }
+  
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+  }
+  
+  .red {
+    background-color: #ff0000;
+  }
+  
+  .orange {
+    background-color: #ffa500;
+  }
+  
+  .yellow {
+    background-color: #dbdb15;
+  }
+  
+  .green {
+    background-color: #008000;
+  }
+  .container-card-actions button {
+    padding: 10px 20px;
+    border: 2px solid #ccc; /* 2px border as requested */
+    border-radius: 20px; /* Makes the buttons round */
+    background-color: transparent; /* Transparent background */
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    font-weight: bold; /* Makes text bold */
+  }
+  
+  .container-card-actions button:hover {
+    background-color: #ccc; /* Light grey background on hover */
+    color: #fff; /* White text on hover */
+  }
+  
+  /* You may also add :focus and :active pseudo-classes for better accessibility */
+  .container-card-actions button:focus,
+  .container-card-actions button:active {
+    outline: none; /* Removes the outline */
+    background-color: #bbb; /* Darker background for active state */
+    color: #fff; /* White text for active state */
+  }
+  .container-card-actions {
+    display: flex;
+    justify-content: center;
+    gap:10px;
+    margin-top: 10px; /* Add space above the action buttons */
+  }
+  .container-card-sell {
+    display: flex;
+    justify-content: center;
+    gap:10px;
+    margin-top: 10px; /* Add space above the action buttons */
+  }
+  .container-name {
+    font-weight: bold;
+  }
+  #sell-button > button {
+    background-color: #4CAF50;
+    padding-left: 50px;
+    padding-right: 50px;
+  }

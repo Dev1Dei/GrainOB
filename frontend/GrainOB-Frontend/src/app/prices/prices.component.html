@@ -1,0 +1,25 @@
+<div class="prices-container">
+  <div class="tab-wrapper">
+    <ul class="nav nav-tabs" id="priceTabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="selectedGrainType === 'Wheat' && selectedGrainClass === 'Class 1'" id="wheat-class-1-tab" data-toggle="tab" role="tab" (click)="onTabChange('Wheat', 'Class 1')">Wheat Class 1</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="selectedGrainType === 'Wheat' && selectedGrainClass === 'Class 2'" id="wheat-class-2-tab" data-toggle="tab" role="tab" (click)="onTabChange('Wheat', 'Class 2')">Wheat Class 2</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="selectedGrainType === 'Wheat' && selectedGrainClass === 'Class 3'" id="wheat-class-3-tab" data-toggle="tab" role="tab" (click)="onTabChange('Wheat', 'Class 3')">Wheat Class 3</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="selectedGrainType === 'Corn' && selectedGrainClass === ''" id="corn-tab" data-toggle="tab" role="tab" (click)="onTabChange('Corn')">Corn</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="selectedGrainType === 'Rapeseed' && selectedGrainClass === ''" id="rapeseed-tab" data-toggle="tab" role="tab" (click)="onTabChange('Rapeseed')">Rapeseed</a>
+      </li>
+    </ul>
+  </div>
+  
+  <div class="chart-container">
+    <canvas id="myChart"></canvas>
+  </div>
+</div>

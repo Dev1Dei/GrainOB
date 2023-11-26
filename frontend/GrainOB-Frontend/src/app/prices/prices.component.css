@@ -1,0 +1,54 @@
+.prices-container {
+    margin-left: 250px; /* Assuming your sidebar is 250px wide */
+    padding: 20px;
+  }
+  
+  .tab-wrapper {
+    overflow-x: auto;
+  }
+  .nav-tabs .nav-item {
+    display: inline-block;
+    margin-bottom: 0; /* Ensures tabs stay in a row */
+  }
+  
+  .nav-tabs .nav-link {
+    border: 1px solid transparent;
+    border-radius: 0.25rem 0.25rem 0 0;
+    padding: 0.5rem 1rem;
+    color: #003a33;
+    background-color: #fff;
+    border-color: #003a334f;
+    border-radius: 15px;
+    margin-right: 2px;
+  }
+  
+  .nav-tabs .nav-link:hover {
+    border-color: #003a33;
+    border-radius: 15px;
+  }
+  
+  .nav-tabs .nav-link.active {
+    color: #B8860B; /* Active tab text color */
+    font-weight: bold;
+    background-color: #003a33; /* Active tab background color */
+    border-color: #dee2e6 #dee2e6 #003a33;
+    border-radius: 15px; /* Active tab border color */
+  }
+  
+  .chart-container {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    height: 500px; /* Set a specific height for the container */
+    display: flex; /* Enables flexbox */
+    justify-content: center; /* Centers chart horizontally */
+    align-items: center; /* Centers chart vertically */
+  }
+  
+  @media (max-width: 768px) {
+    .prices-container {
+      margin-left: 0;
+    }
+  }
+  

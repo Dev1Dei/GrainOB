@@ -17,11 +17,11 @@ namespace GrainOperationAPI.Models
         [Column("grain_class")]
         public string GrainClass { get; set; } // This can be null for certain types of grains
         [Column("Dryness")]
-        public double Dryness { get; set; }
+        public decimal Dryness { get; set; }
         [Column("Cleanliness")]
-        public double Cleanliness { get; set; }
+        public decimal Cleanliness { get; set; }
         [Column("grain_weight")]
-        public double GrainWeight { get; set; }
+        public decimal GrainWeight { get; set; }
         [Column("Arrival")]
         public DateTime ArrivalTime { get; set; }
         [Column("WantedPay")]
@@ -31,7 +31,10 @@ namespace GrainOperationAPI.Models
         [Column("status")]
         public string? Status { get; set; } = "Pending"; // This can be 'Accepted', 'Denied', or null
 
-        // Navigation properties
-        public TruckModel Truck { get; set; } // Navigation property back to TruckModel
+        [Column("container_id")]
+        [ForeignKey(nameof(StorageContainer))]
+        public int? ContainerId { get; set; }
+        public StorageContainerModel StorageContainer { get; set; }
+        public TruckModel Truck { get; set; }
     }
 }

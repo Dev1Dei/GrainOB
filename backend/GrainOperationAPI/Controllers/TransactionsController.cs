@@ -182,8 +182,8 @@ namespace GrainOperationAPI.Controllers
                 Truck = truck,
                 GrainType = transactionDto.Grain.Type,
                 GrainClass = transactionDto.Grain.Class,
-                Dryness = transactionDto.Grain.Dryness,
-                Cleanliness = transactionDto.Grain.Cleanliness,
+                Dryness = (decimal)transactionDto.Grain.Dryness,
+                Cleanliness = (decimal)transactionDto.Grain.Cleanliness,
                 GrainWeight = transactionDto.GrainWeight,
                 ArrivalTime = DateTime.Parse(transactionDto.Arrival),
                 WantedPay = transactionDto.WantedPay,
@@ -215,5 +215,117 @@ namespace GrainOperationAPI.Controllers
             await _hubContext.Clients.All.SendAsync("CreationEventOccurred", creationEvent);
             return CreatedAtAction(nameof(GetTransaction), new { id = transaction.TransactionId }, transaction);
         }
+        [HttpPut("{transactionId}/assign-container")]
+        public async Task<IActionResult> AssignTransactionToContainer(int transactionId, [FromBody] AssignContainerDto dto)
+        {
+            _logger.LogInformation($"Raw request body: {await new StreamReader(Request.Body).ReadToEndAsync()}");
+
+            var transaction = await _context.Transactions.FindAsync(transactionId);
+            if (transaction == null)
+            {
+                _logger.LogWarning($"Transaction with ID {transactionId} not found.");
+                return NotFound("Transaction not found.");
+            }
+
+            var container = await _context.StorageContainers.FindAsync(dto.ContainerId);
+            if (container == null)
+            {
+                _logger.LogWarning($"Container with ID {dto.ContainerId} not found.");
+                return NotFound("Container not found.");
+            }
+
+            if (!IsContainerSuitableForTransaction(container, transaction))
+            {
+                _logger.LogWarning($"Container {dto.ContainerId} is not suitable for transaction {transactionId}.");
+                return BadRequest("The container is not suitable for the transaction.");
+            }
+
+            transaction.ContainerId = dto.ContainerId;
+            _logger.LogInformation($"Assigning container {dto.ContainerId} to transaction {transactionId}.");
+            await _context.SaveChangesAsync();
+            _logger.LogInformation($"Container {dto.ContainerId} has been successfully assigned to transaction {transactionId}.");
+
+            return NoContent();
+        }
+
+
+        private bool IsContainerSuitableForTransaction(StorageContainerModel container, TransactionModel transaction)
+        {
+            decimal transactionGrainWeight = (decimal)transaction.GrainWeight;
+            bool hasEnoughSpace = container.FreeSpace >= transactionGrainWeight;
+
+            // Check if the container is empty (has not been used before)
+            bool isContainerEmpty = container.GrainType == "None" && container.StoredSpace == 0.00M;
+
+            bool matchesGrainType = isContainerEmpty || container.GrainType == transaction.GrainType || container.GrainType == "Any";
+            bool matchesGrainClass = isContainerEmpty || container.GrainClass == transaction.GrainClass || container.GrainClass == "None" || transaction.GrainClass == "None";
+
+            return hasEnoughSpace && matchesGrainType && matchesGrainClass;
+        }
+
+
+        [HttpPost("{transactionId}/complete")]
+        public async Task<IActionResult> CompleteTransaction(int transactionId)
+        {
+            var transaction = await _context.Transactions
+                .Include(t => t.Truck)
+                .FirstOrDefaultAsync(t => t.TransactionId == transactionId);
+
+            if (transaction == null)
+            {
+                _logger.LogError($"Transaction with ID {transactionId} not found.");
+                return NotFound();
+            }
+
+            var container = await _context.StorageContainers
+                .FirstOrDefaultAsync(c => c.ContainerId == transaction.ContainerId);
+
+            if (container == null)
+            {
+                _logger.LogError($"Container with ID {transaction.ContainerId} not found.");
+                return NotFound();
+            }
+
+            // Check if the container has enough space
+            var totalWeightAfterTransaction = container.Weight + (decimal)transaction.GrainWeight;
+            if (totalWeightAfterTransaction > container.TotalCapacity)
+            {
+                _logger.LogError($"Not enough space in container {container.ContainerId} for transaction {transactionId}.");
+                return BadRequest("Not enough space in the container.");
+            }
+
+            // If there was grain in the container before, calculate the weighted average
+            if (container.Weight > 0)
+            {
+                var totalDryness = (container.Dryness * container.Weight) + (transaction.Dryness * transaction.GrainWeight);
+                container.Dryness = totalDryness / totalWeightAfterTransaction;
+
+                var totalCleanliness = (container.Cleanliness * container.Weight) + (transaction.Cleanliness * transaction.GrainWeight);
+                container.Cleanliness = totalDryness / totalWeightAfterTransaction;
+            }
+            else
+            {
+                container.Dryness = (decimal)transaction.Dryness;
+                container.Cleanliness = (decimal)transaction.Cleanliness;
+            }
+
+            // Perform the update here
+            container.GrainType = transaction.GrainType;
+            container.GrainClass = transaction.GrainClass ?? "None";
+            container.Weight = totalWeightAfterTransaction;
+            container.FreeSpace = container.TotalCapacity - container.Weight;
+            container.StoredSpace = container.Weight; // Assuming StoredSpace is the occupied space.
+
+            // Assuming 'Name' is the identifier for the grain's lot or some kind of identifier you can construct.
+            container.Name = container.Name;
+
+            _context.StorageContainers.Update(container);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Transaction {transactionId} has been completed and container {container.ContainerId} updated.");
+
+            return Ok();
+        }
+
     }
 }

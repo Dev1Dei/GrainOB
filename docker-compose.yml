@@ -4,6 +4,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: grainob-db
+      TZ: Europe/Helsinki
     ports:
       - "3309:3306"
     networks:

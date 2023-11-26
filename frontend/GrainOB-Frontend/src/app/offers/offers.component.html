@@ -1,58 +1,77 @@
 <div class="main-content">
-    <div *ngIf="transactions && transactions.length; else noTransactions">
-    <div class="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Truck Numbers</th>
-            <th>Truck Storage (t)</th>
-            <th>Grain Type</th>
-            <th>Grain Class</th>
-            <th>Arrival Time</th>
-            <th>Dryness (%)</th>
-            <th>Cleanliness (%)</th>
-            <th>Wanted Pay (€)</th>
-            <th>PPT (€/t)</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let transaction of transactions">
-            <td>{{ transaction.transactionId }}</td>
-            <td>{{ transaction.farmerFirstName }}</td>
-            <td>{{ transaction.farmerLastName }}</td>
-            <td>{{ transaction.truckNumbers }}</td>
-            <td>{{ transaction.truckStorage }}t</td>
-            <td>{{ transaction.grainType }}</td>
-            <td>
-              <span *ngIf="transaction.grainClass !== 'None'; else blankSpace">{{ transaction.grainClass }}</span>
-              <ng-template #blankSpace>&nbsp;</ng-template>
-            </td>
-            <td>{{ transaction.arrivalTime | date: 'yyyy-MM-dd HH:mm' }}</td>
-            <td>{{ transaction.dryness }}%</td>
-            <td>{{ transaction.cleanliness }}%</td>
-            <td>{{ transaction.wantedPay }}€</td>
-            <td>{{ transaction.pricePerTonne }}€/t</td>
-            <td class="acceptdeny-container">
-              <button class="accept-button" (click)="acceptTransaction(transaction.transactionId)"><i class="fas fa-check"></i> Accept</button>
-              <button class="deny-button" (click)="denyTransaction(transaction.transactionId)"><i class="fas fa-times"></i>Deny</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="pagination-container" *ngIf="totalRecords > pageSize">
-        <button class="pagination-btn" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
-        <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage >= getMaxPage()">Next</button>
+  <div *ngIf="transactions && transactions.length; else noTransactions">
+      <div class="table-responsive">
+          <table>
+              <thead>
+                  <tr>
+                      <th>ID</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Truck Numbers</th>
+                      <th>Truck Storage (t)</th>
+                      <th>Grain Type</th>
+                      <th>Grain Class</th>
+                      <th>Arrival Time</th>
+                      <th>Dryness (%)</th>
+                      <th>Cleanliness (%)</th>
+                      <th>Wanted Pay (€)</th>
+                      <th>PPT (€/t)</th>
+                      <th>Actions</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr *ngFor="let transaction of transactions">
+                      <td>{{ transaction.transactionId }}</td>
+                      <td>{{ transaction.farmerFirstName }}</td>
+                      <td>{{ transaction.farmerLastName }}</td>
+                      <td>{{ transaction.truckNumbers }}</td>
+                      <td>{{ transaction.truckStorage }}t</td>
+                      <td>{{ transaction.grainType }}</td>
+                      <td>
+                          <span *ngIf="transaction.grainClass !== 'None'">{{ transaction.grainClass }}</span>
+                          <ng-template #blankSpace>&nbsp;</ng-template>
+                      </td>
+                      <td>{{ transaction.arrivalTime | date: 'yyyy-MM-dd HH:mm' }}</td>
+                      <td>{{ transaction.dryness }}%</td>
+                      <td>{{ transaction.cleanliness }}%</td>
+                      <td>{{ transaction.wantedPay }}€</td>
+                      <td>{{ transaction.pricePerTonne }}€/t</td>
+                      <td class="acceptdeny-container">
+                          <!-- Dropdown for selecting container -->
+                          <div *ngIf="acceptingTransactionId === transaction.transactionId && filteredContainers.length > 0">
+                            <select [(ngModel)]="selectedContainerId" 
+                                    (change)="onContainerSelected(transaction.transactionId)"
+                                    class="modern-dropdown">
+                              <option *ngFor="let container of filteredContainers" [ngValue]="container.containerId">
+                                {{ container.name }} - {{ container.totalCapacity }}t (Free: {{ container.freeSpace }}t)
+                              </option>
+                            </select>
+                          </div>
+                          <div *ngIf="acceptingTransactionId === transaction.transactionId && filteredContainers.length === 0" 
+                          class="no-containers-message">
+                       Buy some warehouse storage.
+                     </div>
+                     <button class="accept-button" *ngIf="acceptingTransactionId !== transaction.transactionId" 
+                     (click)="onAccept(transaction.transactionId)">
+               <i class="fas fa-check"></i> Accept
+             </button>
+             <!-- Deny button -->
+             <button class="deny-button" (click)="denyTransaction(transaction.transactionId)">
+               <i class="fas fa-times"></i> Deny
+             </button>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
       </div>
-    </div>
-    <ng-template #noTransactions>
+      <div class="pagination-container" *ngIf="totalRecords > pageSize">
+          <button class="pagination-btn" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+          <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage >= getMaxPage()">Next</button>
+      </div>
+  </div>
+  <ng-template #noTransactions>
       <div class="no-transactions">
-        <h2>There are no pending transactions!</h2>
+          <h2>There are no pending transactions!</h2>
       </div>
-    </ng-template>
+  </ng-template>
 </div>
-  

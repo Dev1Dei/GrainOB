@@ -2,21 +2,22 @@ import random
 import time
 import json
 import requests
-import traceback
 
 # Default base prices for reference
 base_prices = {
-    "Wheat Class 1": 225,
-    "Wheat Class 2": 175,
-    "Wheat Class 3": 125,
-    "Corn": 205,
-    "Rapeseed": 450
+    "Wheat": {
+        "Class 1": 225,
+        "Class 2": 175,
+        "Class 3": 125,
+    },
+    "Corn": {"None": 205},
+    "Rapeseed": {"None": 450},
 }
 
 
 def fetch_latest_prices():
     try:
-        api_url = "http://grainoperationapi:5003/api/prices/latest"
+        api_url = "http://grainoperationapi:5003/api/price/latest"
         response = requests.get(api_url)
         if response.status_code == 200:
             prices = response.json()
@@ -42,7 +43,7 @@ def simulate_price_change(price):
 
 def post_data_to_api(price_updates):
     try:
-        api_url = "http://grainoperationapi:5003/api/prices"
+        api_url = "http://grainoperationapi:5003/api/price"
         headers = {"Content-Type": "application/json"}
         response = requests.post(api_url, headers=headers, json=price_updates)
         if response.status_code in [200, 201]:
@@ -57,26 +58,25 @@ def post_data_to_api(price_updates):
 def main():
     while True:
         try:
-            prices = fetch_latest_prices()
+            current_prices = fetch_latest_prices()
             price_updates = []
-            for grain, price in prices.items():
-                updated_price = simulate_price_change(price)
-                grain_type, grain_class = grain.rsplit(' ', 1) if 'Class' in grain else (grain, None)
-                price_updates.append({
-                    "GrainType": grain_type,
-                    "GrainClass": grain_class,
-                    "Price": updated_price
-                })
+            # Loop through grain types and their classes
+            for grain_type, classes in current_prices.items():
+                for grain_class, current_price in classes.items():
+                    new_price = simulate_price_change(current_price)
+                    price_updates.append({
+                        "GrainType": grain_type,
+                        "GrainClass": grain_class if grain_class != "None" else "None",
+                        "Price": new_price
+                    })
 
-            if price_updates:
-                print(json.dumps(price_updates, indent=4))
-                post_data_to_api(price_updates)
+            print(json.dumps(price_updates, indent=4))
+            post_data_to_api(price_updates)  # Send the entire list of updates
 
-            time.sleep(random.randint(300, 600))
-        except Exception as exc:
-            print("Error in main loop:", exc)
-            traceback.print_exc()
-            time.sleep(60)
+            time.sleep(random.randint(300, 600))  # Sleep for 5 to 10 minutes
+        except Exception as e:
+            print("Error in main loop:", e)
+            time.sleep(60)  # Wait a minute before retrying
 
 
 if __name__ == "__main__":
